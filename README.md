@@ -90,17 +90,17 @@ Get trending topics (entities & tags).
 
 3. **Build and run with Docker Compose**:
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
 
 4. **View logs**:
    ```bash
-   docker-compose logs -f
+   docker compose logs -f
    ```
 
 5. **Stop the service**:
    ```bash
-   docker-compose down
+   docker compose down
    ```
 
 ### Without Docker
