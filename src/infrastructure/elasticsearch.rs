@@ -92,6 +92,9 @@ impl EsRepository {
         let mut must: Vec<Value> = Vec::new();
         let mut filter: Vec<Value> = Vec::new();
 
+        // Ensure publish_date_timestamp is not null
+        filter.push(json!({"exists": {"field": "publish_date_timestamp"}}));
+
         if let Some(ref q) = params.q {
             if !q.is_empty() {
                 must.push(json!({
@@ -166,6 +169,13 @@ impl EsRepository {
     pub async fn aggregate_sources(&self) -> Result<Vec<SourceInfo>, AppError> {
         let body = json!({
             "size": 0,
+            "query": {
+                "bool": {
+                    "filter": [
+                        {"exists": {"field": "publish_date_timestamp"}}
+                    ]
+                }
+            },
             "aggs": { "sources": { "terms": { "field": "source", "size": 100 } } }
         });
 
@@ -178,6 +188,13 @@ impl EsRepository {
         let body = json!({
             "size": 0,
             "track_total_hits": true,
+            "query": {
+                "bool": {
+                    "filter": [
+                        {"exists": {"field": "publish_date_timestamp"}}
+                    ]
+                }
+            },
             "aggs": {
                 "sources":  { "terms": { "field": "source", "size": 100 } },
                 "date_min": { "min": { "field": "ingested_at" } },
@@ -203,7 +220,14 @@ impl EsRepository {
     pub async fn trending(&self) -> Result<Vec<TrendingItem>, AppError> {
         let body = json!({
             "size": 0,
-            "query": { "range": { "ingested_at": { "gte": "now-7d/d" } } },
+            "query": {
+                "bool": {
+                    "filter": [
+                        {"exists": {"field": "publish_date_timestamp"}},
+                        {"range": {"ingested_at": {"gte": "now-7d/d"}}}
+                    ]
+                }
+            },
             "aggs": {
                 "entities": { "terms": { "field": "annotate.entities.word.keyword", "size": 20 } },
                 "tags":     { "terms": { "field": "tags", "size": 20 } }
