@@ -1,0 +1,19 @@
+[package]
+name = "online-news-api"
+version = "1.0.0"
+edition = "2021"
+description = "Indonesian Online News API for RapidAPI"
+authors = ["Nasri Adzlani"]
+
+[dependencies]
+actix-web = "4"
+actix-cors = "0.7"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+tokio = { version = "1", features = ["full"] }
+dotenv = "0.15"
+chrono = { version = "0.4", features = ["serde"] }
+dashmap = "6"
+env_logger = "0.11"
+log = "0.4"
