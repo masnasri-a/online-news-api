@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: online-news-api
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - .env
+    environment:
+      - ES_HOST=${ES_HOST}
+      - ES_USERNAME=${ES_USERNAME}
+      - ES_PASSWORD=${ES_PASSWORD}
+      - ES_INDEX_PATTERN=${ES_INDEX_PATTERN}
+      - PORT=${PORT:-3000}
+      - RAPIDAPI_PROXY_SECRET=${RAPIDAPI_PROXY_SECRET}
+      - RATE_LIMIT_BASIC=${RATE_LIMIT_BASIC:-5}
+      - RATE_LIMIT_PRO=${RATE_LIMIT_PRO:-100}
+      - RATE_LIMIT_ULTRA=${RATE_LIMIT_ULTRA:-1000}
+      - RATE_LIMIT_MEGA=${RATE_LIMIT_MEGA:-10000}
+    restart: unless-stopped
+    networks:
+      - online-news-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  online-news-network:
+    driver: bridge

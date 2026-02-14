@@ -67,13 +67,46 @@ Get trending topics (entities & tags).
 
 ## 🛠️ Self-Hosting
 
-1. **Configure `.env`**:
+### With Docker (Recommended)
+
+1. **Copy environment file**:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Configure `.env`** with your settings:
    ```ini
+   ES_HOST=https://your-elasticsearch-host
+   ES_USERNAME=elastic
+   ES_PASSWORD=your-password
+   ES_INDEX_PATTERN=online-news-*
+   PORT=3000
+   RAPIDAPI_PROXY_SECRET=your-secret
    RATE_LIMIT_BASIC=5
    RATE_LIMIT_PRO=100
    RATE_LIMIT_ULTRA=1000
    RATE_LIMIT_MEGA=10000
    ```
+
+3. **Build and run with Docker Compose**:
+   ```bash
+   docker-compose up -d
+   ```
+
+4. **View logs**:
+   ```bash
+   docker-compose logs -f
+   ```
+
+5. **Stop the service**:
+   ```bash
+   docker-compose down
+   ```
+
+### Without Docker
+
+1. **Configure `.env`** (same as above)
+
 2. **Run Server**:
    ```bash
    cargo run
