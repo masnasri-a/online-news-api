@@ -64,11 +64,8 @@ where
     }
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
-        let is_dev = self.proxy_secret.is_empty()
-            || self.proxy_secret == "your-rapidapi-proxy-secret-here";
-
         // Skip auth for health endpoint or dev mode
-        if req.path() == "/api/health" || is_dev {
+        if req.path() == "/ping" {
             let fut = self.service.call(req);
             return Box::pin(async move {
                 let res = fut.await?;
@@ -76,27 +73,6 @@ where
             });
         }
 
-        // Validate proxy secret
-        let header = req.headers()
-            .get("X-RapidAPI-Proxy-Secret")
-            .and_then(|v| v.to_str().ok())
-            .unwrap_or("")
-            .to_string();
-
-        if header != self.proxy_secret {
-            warn!("Rejected: invalid X-RapidAPI-Proxy-Secret");
-            let body = AuthError {
-                success: false,
-                error: AuthErrorDetail {
-                    code: 403,
-                    message: "Forbidden: Invalid API proxy secret".into(),
-                },
-            };
-            let response = HttpResponse::Forbidden().json(body);
-            return Box::pin(async move {
-                Ok(req.into_response(response).map_into_right_body())
-            });
-        }
 
         let fut = self.service.call(req);
         Box::pin(async move {
